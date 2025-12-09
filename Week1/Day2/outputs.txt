@@ -1,0 +1,20 @@
+igw_id = "igw-0364cf976f0790494"
+route_table_association_ids = [
+  "rtbassoc-0e20eeed452602b30",
+  "rtbassoc-0c5ba9e8cd9962533",
+]
+route_table_id = "rtb-05b917606f2cf1c6b"
+subnet_azs = [
+  "ap-south-1a",
+  "ap-south-1b",
+]
+subnet_cidrs = [
+  "10.0.0.0/24",
+  "10.0.1.0/24",
+]
+subnet_ids = [
+  "subnet-0d2f2443d7b725337",
+  "subnet-0f0865b85da40a3d8",
+]
+vpc_cidr_block = "10.0.0.0/16"
+vpc_id = "vpc-0aec5118e3af1c204"
