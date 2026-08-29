@@ -27,3 +27,19 @@ variable "instance_type" {
   default     = "t3.micro"
   description = "Instance type for the EC2 instance"
 }
+
+
+variable "min_size" {
+  type        = number
+  description = "Minimum number of instances in the Auto Scaling Group"
+}
+
+variable "max_size" {
+  type        = number
+  description = "Maximum number of instances in the Auto Scaling Group"
+}
+
+variable "desired_capacity" {
+  type        = number
+  description = "Desired number of instances in the Auto Scaling Group"
+}

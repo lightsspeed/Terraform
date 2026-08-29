@@ -18,7 +18,7 @@ module "asg_alb" {
   security_group_id = module.security_group.security_group_id
 
   instance_type    = var.instance_type
-  min_size         = 1
-  max_size         = 2
-  desired_capacity = 1
+  min_size         = var.min_size
+  max_size         = var.max_size
+  desired_capacity = var.desired_capacity
 }
