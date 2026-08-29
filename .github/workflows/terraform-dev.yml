@@ -21,7 +21,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  # LEVEL 1: CHECKS, VALIDATIONS & DEVSECOPS SCANS
   validate_and_plan:
     name: "Level 1: Dev Lint, Validate & Security Scan"
     runs-on: ubuntu-latest
@@ -38,7 +37,7 @@ jobs:
         with:
           terraform_version: "1.9.0"
 
-      - name: Configure AWS Credentials (OIDC Role or Secrets)
+      - name: Configure AWS Credentials (OIDC or Secret)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -67,7 +66,6 @@ jobs:
         id: plan
         run: terraform plan -no-color
 
-      # Post Plan Output to PR Comments for Peer Review
       - name: Comment Plan on PR
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
@@ -95,7 +93,6 @@ jobs:
         env:
           PLAN_OUTPUT: "${{ steps.plan.outputs.stdout }}"
 
-  # LEVEL 2: DEV DEPLOYMENT
   deploy_dev:
     name: "Level 2: Dev Deploy & Verification"
     needs: validate_and_plan
@@ -115,7 +112,7 @@ jobs:
         with:
           terraform_version: "1.9.0"
 
-      - name: Configure AWS Credentials (OIDC Role or Secrets)
+      - name: Configure AWS Credentials (OIDC or Secret)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
