@@ -32,14 +32,17 @@ variable "instance_type" {
 variable "min_size" {
   type        = number
   description = "Minimum number of instances in the Auto Scaling Group"
+  default     = 3
 }
 
 variable "max_size" {
   type        = number
   description = "Maximum number of instances in the Auto Scaling Group"
+  default     = 5
 }
 
 variable "desired_capacity" {
   type        = number
   description = "Desired number of instances in the Auto Scaling Group"
+  default     = 3
 }
