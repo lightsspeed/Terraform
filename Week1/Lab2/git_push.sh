@@ -1,9 +1,12 @@
 #!/bin/bash
 set -e
 
-# Automatically resolve the repository root directory
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$SCRIPT_DIR"
+# Automatically resolve the top-level Git repository root
+GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo ".")"
+cd "$GIT_ROOT"
+
+# Path to Terraform lab directory relative to git root
+LAB_PATH="Week1/Lab2"
 
 # Default commit message if none provided
 COMMIT_MSG="${1:-Update Terraform infrastructure and GitHub Actions workflows}"
@@ -22,16 +25,16 @@ echo " LEVEL 1: PRE-PUSH TERRAFORM CHECKS"
 echo "========================================="
 
 echo "[1/3] Checking Code Formatting..."
-if ! terraform fmt -check -recursive; then
+if ! terraform fmt -check -recursive "$LAB_PATH"; then
     echo "WARNING: Unformatted files found. Running 'terraform fmt -recursive' to fix..."
-    terraform fmt -recursive
+    terraform fmt -recursive "$LAB_PATH"
 fi
 
 echo "[2/3] Validating Dev Environment..."
-(cd environments/dev && terraform init -backend=false > /dev/null 2>&1 && terraform validate)
+(cd "$LAB_PATH/environments/dev" && terraform init -backend=false > /dev/null 2>&1 && terraform validate)
 
 echo "[3/3] Validating Prod Environment..."
-(cd environments/prod && terraform init -backend=false > /dev/null 2>&1 && terraform validate)
+(cd "$LAB_PATH/environments/prod" && terraform init -backend=false > /dev/null 2>&1 && terraform validate)
 
 echo "=== All Level 1 Checks Passed Successfully! ==="
 
