@@ -4,9 +4,13 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-# Automatically resolve the repository root directory
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-Set-Location $ScriptDir
+# Automatically resolve the top-level Git repository root
+$gitRoot = (git rev-parse --show-toplevel 2>$null).Trim()
+if ($gitRoot) {
+    Set-Location $gitRoot
+}
+
+$labPath = "Week1/Lab2"
 
 # Get current branch name
 $branch = (git branch --show-current).Trim()
@@ -21,20 +25,20 @@ Write-Host " LEVEL 1: PRE-PUSH TERRAFORM CHECKS" -ForegroundColor Yellow
 Write-Host "=========================================" -ForegroundColor Yellow
 
 Write-Host "[1/3] Checking Code Formatting..." -ForegroundColor Cyan
-terraform fmt -check -recursive
+terraform fmt -check -recursive $labPath
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Auto-formatting files with terraform fmt..." -ForegroundColor Yellow
-    terraform fmt -recursive
+    terraform fmt -recursive $labPath
 }
 
 Write-Host "[2/3] Validating Dev Environment..." -ForegroundColor Cyan
-Push-Location environments/dev
+Push-Location "$labPath/environments/dev"
 terraform init -backend=false | Out-Null
 terraform validate
 Pop-Location
 
 Write-Host "[3/3] Validating Prod Environment..." -ForegroundColor Cyan
-Push-Location environments/prod
+Push-Location "$labPath/environments/prod"
 terraform init -backend=false | Out-Null
 terraform validate
 Pop-Location
