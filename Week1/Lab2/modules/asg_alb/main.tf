@@ -9,6 +9,12 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+# Local formatted tags matching FinOps policy (Dev / Prod)
+locals {
+  env_tag     = title(var.environment) # "Dev" or "Prod"
+  service_tag = "webserver"
+}
+
 # 2. Launch Template (LT)
 resource "aws_launch_template" "web" {
   name_prefix   = "${var.environment}-lt-"
@@ -31,7 +37,8 @@ resource "aws_launch_template" "web" {
     resource_type = "instance"
     tags = {
       Name        = "${var.environment}-asg-instance"
-      Environment = var.environment
+      Environment = local.env_tag
+      Service     = local.service_tag
       ManagedBy   = "Terraform"
     }
   }
@@ -47,7 +54,8 @@ resource "aws_lb" "web" {
 
   tags = {
     Name        = "${var.environment}-alb"
-    Environment = var.environment
+    Environment = local.env_tag
+    Service     = local.service_tag
     ManagedBy   = "Terraform"
   }
 }
@@ -71,7 +79,8 @@ resource "aws_lb_target_group" "web" {
 
   tags = {
     Name        = "${var.environment}-tg"
-    Environment = var.environment
+    Environment = local.env_tag
+    Service     = local.service_tag
     ManagedBy   = "Terraform"
   }
 }
@@ -104,6 +113,18 @@ resource "aws_autoscaling_group" "web" {
 
   health_check_type         = "ELB"
   health_check_grace_period = 300
+
+  tag {
+    key                 = "Environment"
+    value               = local.env_tag
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Service"
+    value               = local.service_tag
+    propagate_at_launch = true
+  }
 
   lifecycle {
     create_before_destroy = true
