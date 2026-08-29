@@ -3,9 +3,9 @@ output "vpc_id" {
   description = "The ID of the Prod VPC"
 }
 
-output "subnet_id" {
-  value       = module.vpc.subnet_id
-  description = "The ID of the Prod Subnet"
+output "subnet_ids" {
+  value       = module.vpc.subnet_ids
+  description = "The IDs of the Prod public subnets"
 }
 
 output "security_group_id" {

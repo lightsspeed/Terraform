@@ -4,7 +4,12 @@ variable "cidr_block" {
   description = "VPC CIDR Block"
 }
 
-variable "az" {
-  type        = string
-  description = "Availability Zone"
+variable "public_subnet_cidrs" {
+  type        = list(string)
+  description = "List of CIDR blocks for public subnets (minimum 2 for ALB)"
+}
+
+variable "azs" {
+  type        = list(string)
+  description = "List of Availability Zones (minimum 2 for ALB)"
 }

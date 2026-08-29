@@ -9,13 +9,15 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "main" {
+# Public Subnets (1 per AZ - minimum 2 required for ALB)
+resource "aws_subnet" "public" {
+  count             = length(var.azs)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.cidr_block
-  availability_zone = var.az
+  cidr_block        = var.public_subnet_cidrs[count.index]
+  availability_zone = var.azs[count.index]
 
   tags = {
-    Name = "Main"
+    Name = "public-subnet-${var.azs[count.index]}"
   }
 }
 
@@ -36,7 +38,8 @@ resource "aws_route_table" "main" {
   }
 }
 
-resource "aws_route_table_association" "main" {
-  subnet_id      = aws_subnet.main.id
+resource "aws_route_table_association" "public" {
+  count          = length(var.azs)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.main.id
 }
