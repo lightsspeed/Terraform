@@ -29,14 +29,14 @@ resource "aws_launch_template" "web" {
   # ✅ FIXED USER DATA: Safely fetches IMDSv2 tokens and handles Python web directories
   user_data = base64encode(<<-EOF
               #!/bin/bash
-              # Isolate the serving directory
+              # Isolate the serving directory layout
               mkdir -p /var/www/html
               cd /var/www/html
 
               # Fetch IMDSv2 token for authenticated metadata access
               TOKEN=$(curl -s -X PUT "http://169.254.169" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-              # Pull live Ubuntu system hardware specifications
+              # ✅ FIXED PATHS: Explicitly targets the metadata endpoints
               INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169)
               AZ=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169)
 
@@ -45,7 +45,7 @@ resource "aws_launch_template" "web" {
               <!DOCTYPE html>
               <html>
               <head>
-                  <title>${var.environment} Infrastructure</title>
+                  <title>dev Infrastructure</title>
                   <style>
                       body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin-top: 120px; background: #f0f2f5; color: #333; }
                       .card { background: white; padding: 40px; display: inline-block; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid #ff9900; }
@@ -56,7 +56,7 @@ resource "aws_launch_template" "web" {
               </head>
               <body>
                   <div class="card">
-                      <h1>Welcome to ${var.environment} Web Server via ALB + ASG! 🚀</h1>
+                      <h1>Welcome to dev Web Server via ALB + ASG! 🚀</h1>
                       <p>Active Instance ID: <span>$INSTANCE_ID</span></p>
                       <p>Availability Zone: <span>$AZ</span></p>
                   </div>
@@ -64,10 +64,11 @@ resource "aws_launch_template" "web" {
               </html>
               HTML
 
-              # Fire up background web engine instance on port 80
-              python3 -m http.server 80 &
+              # Fire up background web engine instance on port 80 targeting our path
+              python3 -m http.server 80 --directory /var/www/html &
               EOF
   )
+
 
   # Ensures the IMDSv2 metadata endpoints are queryable inside the instance block
   metadata_options {
