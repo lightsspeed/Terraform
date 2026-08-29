@@ -1,0 +1,11 @@
+#add all the terraform related in gitingore
+
+# Ignore Terraform state & local directories across all folders
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/*.tfstate.backup
+
+# Ignore sensitive variable values
+*.tfvars
+*.tfvars.json
